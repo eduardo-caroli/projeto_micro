@@ -1,0 +1,27 @@
+[
+  {
+    "name": "A3",
+    "width": 29.7,
+    "height": 42.0
+  },
+  {
+    "name": "A4",
+    "width": 21.0,
+    "height": 29.7
+  },
+  {
+    "name": "Carta",
+    "width": 21.6,
+    "height": 27.9
+  },
+  {
+    "name": "Ofício",
+    "width": 21.6,
+    "height": 35.6
+  },
+  {
+    "name": "Tablóide",
+    "width": 27.9,
+    "height": 43.2
+  }
+]
