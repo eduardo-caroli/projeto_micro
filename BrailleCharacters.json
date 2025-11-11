@@ -25,5 +25,6 @@
   {"corresponding_character": "W", "punchHoleBitmap": [[false, true], [true, true], [false, true]]},
   {"corresponding_character": "X", "punchHoleBitmap": [[true, true], [false, false], [true, true]]},
   {"corresponding_character": "Y", "punchHoleBitmap": [[true, true], [false, true], [true, true]]},
-  {"corresponding_character": "Z", "punchHoleBitmap": [[true, false], [false, true], [true, true]]}
+  {"corresponding_character": "Z", "punchHoleBitmap": [[true, false], [false, true], [true, true]]},
+{"corresponding_character": " ", "punchHoleBitmap": [[false, false], [false, false], [false, false]]}
 ]
