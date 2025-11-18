@@ -6,6 +6,7 @@ from paperDimensions import getPaperDimensionOptions
 from TKComponents.BrailleCharacter import *
 from TKComponents.LabeledEntry import LabeledEntry
 from BrailleCharacter import *
+from InterfaceState import InterfaceState
 
 
 #Frames
@@ -61,16 +62,42 @@ param_tkvars={
 
 #Button Actions
 fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
-    textToConvertEntry.get('1.0', tkinter.END), brailleCanvas, float(marginWidth.get()), float(marginWidth.get()),
+    textToConvertEntry.get('1.0', 'end - 1c'), brailleCanvas, float(marginWidth.get()), float(marginWidth.get()),
     [dimension for dimension in getPaperDimensionOptions() if dimension.name == selectedPaperDimension.get()][0],
     canvasWidth, marginWidth,
     dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar, h_outer_spacing_tkvar, v_outer_spacing_tkvar
 )
 
 def cvtOpenButtonAction():
-    textToConvertEntry.delete('1.0', tkinter.END)
-    buttonActions.openButtonAction(textToConvertEntry)
+    content=buttonActions.openButtonAction(textToConvertEntry)
+    if content is not None:
+        interface_state = InterfaceState.model_validate_json(content)
+        dot_radius_tkvar.set(interface_state.radius)
+        h_spacing_tkvar.set(interface_state.internal_hspace)
+        v_spacing_tkvar.set(interface_state.internal_vspace)
+        h_outer_spacing_tkvar.set(interface_state.external_hspace)
+        v_outer_spacing_tkvar.set(interface_state.external_vspace)
+        marginWidth.set(interface_state.margin)
+        textToConvertEntry.delete('1.0', 'end')
+        textToConvertEntry.insert('end-1c', interface_state.text)
+        selectedPaperDimension.set(interface_state.paper_type)
+
     fooBarBaz()
+
+def saveButtonAction():
+    state = InterfaceState(
+        radius=float(dot_radius_tkvar.get()),
+        internal_hspace=float(h_spacing_tkvar.get()),
+        internal_vspace=float(v_spacing_tkvar.get()),
+        external_hspace=float(h_outer_spacing_tkvar.get()),
+        external_vspace=float(v_outer_spacing_tkvar.get()),
+        margin=float(marginWidth.get()),
+        text=textToConvertEntry.get('1.0', tkinter.END)[:-1],
+        paper_type=selectedPaperDimension.get()
+    )
+    buttonActions.saveButtonAction(
+        state.model_dump_json()
+    )
 
 #Elements
 row=0
@@ -85,7 +112,7 @@ for label, tkvar in param_tkvars.items():
 
 openButton=tkinter.Button(buttonsFrame, text=openString, command = cvtOpenButtonAction).pack(side='left', expand=True, fill='x')
 
-saveButton=tkinter.Button(buttonsFrame, text=saveString, command = buttonActions.saveButtonAction).pack(side='left', expand=True, fill='x')
+saveButton=tkinter.Button(buttonsFrame, text=saveString, command = saveButtonAction).pack(side='left', expand=True, fill='x')
 
 sendButton=tkinter.Button(buttonsFrame, text=sendString, command = buttonActions.sendButtonAction).pack(side='left', expand=True, fill='x')
 

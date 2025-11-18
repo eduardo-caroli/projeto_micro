@@ -7,15 +7,28 @@ from math import floor
 def openButtonAction(variavelDeTexto):
     caminho = filedialog.askopenfilename(
         title="Selecione um arquivo",
-        filetypes=[("Arquivos de texto", "*.txt")]
+        filetypes=[
+            ("Arquivos de texto", "*.txt"),
+            ("Estado da interface", "*.json")
+        ]
     )
     if caminho:
         with open(caminho, "r", encoding="utf-8") as f:
             conteudo = f.read()
-            variavelDeTexto.insert(tk.END, conteudo)
+            if caminho.endswith('txt'):
+                variavelDeTexto.insert(tk.END, conteudo)
+                return None
+            elif caminho.endswith('json'):
+                return conteudo
+                    
+            
 
-def saveButtonAction():
-    pass
+def saveButtonAction(text):
+    f = filedialog.asksaveasfile(mode='w', defaultextension=".json")
+    if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
+        return
+    f.write(text)
+    f.close()
 
 def sendButtonAction():
     pass
