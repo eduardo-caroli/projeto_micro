@@ -27,11 +27,11 @@ paperDimensionOptions=getPaperDimensionOptions()
 paperDimensionOptionNames=[
     option.name for option in paperDimensionOptions
 ]
-dot_radius=5
-h_spacing=10
-v_spacing=10
-h_outer_spacing=10
-v_outer_spacing=10
+dot_radius=5/30
+h_spacing=10/30
+v_spacing=10/30
+h_outer_spacing=10/30
+v_outer_spacing=10/30
 
 
 #TKInter variables
@@ -40,12 +40,22 @@ charactersPerLine = tkinter.StringVar(root, value="20")
 selectedPaperDimension = tkinter.StringVar(root, value=paperDimensionOptionNames[0])
 textToConvert = tkinter.StringVar(root)
 
+dot_radius_tkvar=tkinter.StringVar(root)
+h_spacing_tkvar=tkinter.StringVar(root)
+v_spacing_tkvar=tkinter.StringVar(root)
+h_outer_spacing_tkvar=tkinter.StringVar(root)
+v_outer_spacing_tkvar=tkinter.StringVar(root)
+param_tkvars=[
+    dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar,
+    h_outer_spacing_tkvar, v_outer_spacing_tkvar
+]
+
 #Button Actions
 fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
-    textToConvert, brailleCanvas, int(marginWidth.get()), int(marginWidth.get()),
+    textToConvert, brailleCanvas, float(marginWidth.get()), float(marginWidth.get()),
     [dimension for dimension in getPaperDimensionOptions() if dimension.name == selectedPaperDimension.get()][0],
     canvasWidth, marginWidth,
-    dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing
+    dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar, h_outer_spacing_tkvar, v_outer_spacing_tkvar
 )
 
 def cvtOpenButtonAction():
@@ -53,18 +63,23 @@ def cvtOpenButtonAction():
     fooBarBaz()
 
 #Elements
+for tkvar in param_tkvars:
+    tkinter.Entry(
+        optionsFrame, textvariable=tkvar, width=15
+    ).pack()
+
 openButton=tkinter.Button(buttonsFrame, text=openString, command = cvtOpenButtonAction).pack(side='left', expand=True, fill='x')
 
 saveButton=tkinter.Button(buttonsFrame, text=saveString, command = buttonActions.saveButtonAction).pack(side='left', expand=True, fill='x')
 
 sendButton=tkinter.Button(buttonsFrame, text=sendString, command = buttonActions.sendButtonAction).pack(side='left', expand=True, fill='x')
 
-marginEntry=tkinter.Entry(optionsFrame, width=10, textvariable=marginWidth).pack()
+marginEntry=tkinter.Entry(optionsFrame, textvariable=marginWidth).pack(side="left", expand=True, fill="x")
 textToConvertEntry=tkinter.Entry(optionsFrame, width=100, textvariable=textToConvert).pack()
 submitTextToConvertButton=tkinter.Button(
-    optionsFrame, text=submitTextToConvertString,
+    buttonsFrame, text=submitTextToConvertString,
     command=fooBarBaz
-).pack(side="bottom")
+).pack(side="left", expand=True, fill='x')
 
 paperDimensionsSelection=tkinter.OptionMenu(
     optionsFrame,

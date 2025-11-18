@@ -1,6 +1,7 @@
 from BrailleCharacter import *
 from TKComponents.BrailleCharacter import draw_character_string
 from tkinter import filedialog
+from math import floor
 
 def openButtonAction(variavelDeTexto):
     caminho = filedialog.askopenfilename(
@@ -25,7 +26,7 @@ def calculateCharLim(
 ):
     canvasWidth = paperDimensionOption.width
     charWidth = (4 * dot_radius) + h_spacing
-    charLim=(h_outer_spacing + canvasWidth - 2 * marginWidth) / (charWidth + h_outer_spacing)
+    charLim=(canvasWidth - (2 * marginWidth) + h_outer_spacing) / (charWidth + h_outer_spacing)
     return charLim
 
 def cmsToPixels(paperDimensionOption, paperScreenWidth, arg):
@@ -36,16 +37,20 @@ def submitTextToConvertAction(
     paperDimensionOption, currCanvasWidthInPixels,
     marginWidth, dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing
 ):
+    (dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing) = (
+        float(field.get())
+        for field in (dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing)
+    )
     marginWidth = float(marginWidth.get())
     charLim = calculateCharLim(
         dot_radius, h_spacing, v_spacing,
         h_outer_spacing, v_outer_spacing,
         paperDimensionOption, marginWidth
     )
-    dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing, marginWidth = (
+    iniX, iniY, dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing, marginWidth = (
         cmsToPixels(paperDimensionOption, currCanvasWidthInPixels, arg) 
         for arg in (
-            dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing, marginWidth
+           iniX, iniY,  dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing, marginWidth
         )
     )
     ratio = paperDimensionOption.height / paperDimensionOption.width
@@ -59,6 +64,7 @@ def submitTextToConvertAction(
         [True, True],
         [True, True]
     ]
+    charLim=int(floor(charLim))
     draw_character_string(
         brailleCanvas,
         [
