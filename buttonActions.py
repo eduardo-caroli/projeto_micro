@@ -1,3 +1,4 @@
+import tkinter as tk
 from BrailleCharacter import *
 from TKComponents.BrailleCharacter import draw_character_string
 from tkinter import filedialog
@@ -11,7 +12,7 @@ def openButtonAction(variavelDeTexto):
     if caminho:
         with open(caminho, "r", encoding="utf-8") as f:
             conteudo = f.read()
-            variavelDeTexto.set(conteudo)
+            variavelDeTexto.insert(tk.END, conteudo)
 
 def saveButtonAction():
     pass

@@ -68,7 +68,8 @@ fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
 )
 
 def cvtOpenButtonAction():
-    buttonActions.openButtonAction(textToConvert)
+    textToConvertEntry.delete('1.0', tkinter.END)
+    buttonActions.openButtonAction(textToConvertEntry)
     fooBarBaz()
 
 #Elements
