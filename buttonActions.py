@@ -58,7 +58,7 @@ def submitTextToConvertAction(
     brailleCanvas.config(height=newCanvasHeight)
     brailleCanvas.delete('all')
     lkp=BrailleCharacter.chars_as_dict(get_all_braille_characters()) 
-    text_variable_content = textVariable.get()
+    text_variable_content = textVariable
     default = [
         [True, True],
         [True, True],
@@ -75,3 +75,8 @@ def submitTextToConvertAction(
         dot_radius, h_spacing, v_spacing,
         h_outer_spacing, v_outer_spacing
     )
+    canvasWidth=currCanvasWidthInPixels
+    brailleCanvas.create_line(iniX, 0, iniX, newCanvasHeight, dash=(2,2), fill="blue", width=1)
+    brailleCanvas.create_line(canvasWidth - iniX, 0, canvasWidth - iniX, newCanvasHeight, dash=(2,2), fill="blue", width=1)
+    brailleCanvas.create_line(0, iniY, canvasWidth, iniY, dash=(2,2), fill='green', width=1)
+    brailleCanvas.create_line(0, newCanvasHeight-iniY, canvasWidth, newCanvasHeight-iniY, dash=(2,2), fill='green', width=1)

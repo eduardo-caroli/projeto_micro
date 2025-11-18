@@ -4,6 +4,7 @@ import buttonActions
 from stringLookup import *
 from paperDimensions import getPaperDimensionOptions
 from TKComponents.BrailleCharacter import *
+from TKComponents.LabeledEntry import LabeledEntry
 from BrailleCharacter import *
 
 
@@ -11,8 +12,12 @@ from BrailleCharacter import *
 root = tkinter.Tk(screenName="main_screen")
 sheetFrame = tk.Frame(root)
 sheetFrame.pack(side="left", fill="y")
-optionsFrame = tk.Frame(root)
-optionsFrame.pack(side="right", fill="y")
+textAndOptionsFrame = tk.Frame(root)
+textAndOptionsFrame.pack(side="right", fill="y")
+optionsFrame = tk.Frame(textAndOptionsFrame)
+optionsFrame.pack(side="bottom", fill="x")
+textFrame=tk.Frame(textAndOptionsFrame)
+textFrame.pack(side="top", fill="x")
 buttonsFrame = tk.Frame(sheetFrame)
 buttonsFrame.pack(side="bottom", fill="x")
 leavesFrame = tk.Frame(sheetFrame)
@@ -45,14 +50,18 @@ h_spacing_tkvar=tkinter.StringVar(root)
 v_spacing_tkvar=tkinter.StringVar(root)
 h_outer_spacing_tkvar=tkinter.StringVar(root)
 v_outer_spacing_tkvar=tkinter.StringVar(root)
-param_tkvars=[
-    dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar,
-    h_outer_spacing_tkvar, v_outer_spacing_tkvar
-]
+param_tkvars={
+    "Raio": dot_radius_tkvar,
+    "Espaço interno horizontal": h_spacing_tkvar,
+    "Espaço interno vertical": v_spacing_tkvar,
+    "Espaço externo horizontal": h_outer_spacing_tkvar,
+    "Espaço externo vertical": v_outer_spacing_tkvar,
+    "Margem": marginWidth
+}
 
 #Button Actions
 fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
-    textToConvert, brailleCanvas, float(marginWidth.get()), float(marginWidth.get()),
+    textToConvertEntry.get('1.0', tkinter.END), brailleCanvas, float(marginWidth.get()), float(marginWidth.get()),
     [dimension for dimension in getPaperDimensionOptions() if dimension.name == selectedPaperDimension.get()][0],
     canvasWidth, marginWidth,
     dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar, h_outer_spacing_tkvar, v_outer_spacing_tkvar
@@ -63,10 +72,15 @@ def cvtOpenButtonAction():
     fooBarBaz()
 
 #Elements
-for tkvar in param_tkvars:
-    tkinter.Entry(
-        optionsFrame, textvariable=tkvar, width=15
-    ).pack()
+row=0
+col=0
+for label, tkvar in param_tkvars.items():
+    LabeledEntry(
+        optionsFrame, textvariable=tkvar, width=15, label_text=label
+    ).grid(row=row, column=col)
+    col = (col + 1) % 3
+    if col == 0:
+        row += 1
 
 openButton=tkinter.Button(buttonsFrame, text=openString, command = cvtOpenButtonAction).pack(side='left', expand=True, fill='x')
 
@@ -74,15 +88,15 @@ saveButton=tkinter.Button(buttonsFrame, text=saveString, command = buttonActions
 
 sendButton=tkinter.Button(buttonsFrame, text=sendString, command = buttonActions.sendButtonAction).pack(side='left', expand=True, fill='x')
 
-marginEntry=tkinter.Entry(optionsFrame, textvariable=marginWidth).pack(side="left", expand=True, fill="x")
-textToConvertEntry=tkinter.Entry(optionsFrame, width=100, textvariable=textToConvert).pack()
+textToConvertEntry=tkinter.Text(textFrame, width=70)
+textToConvertEntry.pack(pady=10,padx=10)
 submitTextToConvertButton=tkinter.Button(
     buttonsFrame, text=submitTextToConvertString,
     command=fooBarBaz
 ).pack(side="left", expand=True, fill='x')
 
 paperDimensionsSelection=tkinter.OptionMenu(
-    optionsFrame,
+    root,
     selectedPaperDimension,
     *[option.name for option in getPaperDimensionOptions()]
 ).pack()
