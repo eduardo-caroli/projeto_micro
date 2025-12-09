@@ -102,6 +102,9 @@ def saveButtonAction():
         state.model_dump_json()
     )
 
+def sendButtonAction():
+    buttonActions.sendButtonAction([[]],[[]], brailleCanvas)
+
 #Elements
 row=0
 col=0

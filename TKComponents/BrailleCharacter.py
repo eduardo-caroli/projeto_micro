@@ -1,4 +1,7 @@
 from typing import List
+import serial
+
+port="adm"
 
 def draw_braille(
     canvas, ini_x: float, ini_y: float,

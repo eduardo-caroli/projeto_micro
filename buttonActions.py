@@ -1,18 +1,51 @@
 import tkinter as tk
 from threading import Timer
 from time import sleep
+import threading
 from BrailleCharacter import *
 from TKComponents.BrailleCharacter import draw_character_string
 from tkinter import filedialog
 from math import floor
+import serial
 
 printing_rect_id = None
 printed_rect_id = None
-printing_line = None
-printed_line = None
-is_printing = False
+num_printed_lines = None
+writing_to_printer = True
 
-def updateRect(canvas, line_width, line_height):
+port="port"
+
+try:
+    ard = serial.Serial(
+        port=port,
+        baudrate=9600
+    )
+except serial.serialutil.SerialException:
+    print(f"Impossivel conectar ao Arduino com porta {port}")
+    ard = None
+
+def _encode_line(line):
+    return str(line).encode('utf-8')
+
+def _write_to_printer(lines_of_text: list[list[bool]], canvas, lineWidth, lineHeight):
+    global writing_to_printer
+    global num_printed_lines
+    num_printed_lines=0
+    total_lines_to_print = len(lines_of_text)
+    while True:
+        line = ard.readline()
+        if "Linha recebida" in line:
+            num_printed_lines += 1
+            if num_printed_lines >= total_lines_to_print:
+                print("Impressao finalizada")
+                writing_to_printer = False
+                return
+            _updateRect(canvas, lineWidth, lineHeight)
+            line_to_print = num_printed_lines
+            encoded_line = _encode_line(lines_of_text[line_to_print])
+            ard.write(encoded_line)
+
+def _updateRect(canvas, line_width, line_height):
     global printing_rect_id
     global printed_rect_id
     global printing_line
@@ -32,8 +65,7 @@ def updateRect(canvas, line_width, line_height):
         )
     printing_line += 1
     printed_line += 1
-    Timer(2, updateRect, args=(canvas, line_width, line_height)).start()
-
+    Timer(2, _updateRect, args=(canvas, line_width, line_height)).start()
 
 def openButtonAction(variavelDeTexto):
     caminho = filedialog.askopenfilename(
@@ -61,15 +93,14 @@ def saveButtonAction(text):
     f.write(text)
     f.close()
 
-def sendButtonAction(canvas):
-    line_height = 90
-    line_width=500
-    global printing_line
-    global printed_line
-    printing_line = 0
-    printed_line = -1
-    updateRect(canvas, line_width, line_height)
-
+def sendButtonAction(lines_of_text: list[list[bool]], canvas):
+    global writing_to_printer
+    if ard is None:
+        print("Arduino nao conectado")
+        return
+    writing_to_printer=True
+    Thread(target=_write_to_printer, daemon=True, args=(lines_of_text, canvas, lineWidth, lineHeight)).start()
+    
 
 def calculateCharLim(
     dot_radius, h_spacing, v_spacing, h_outer_spacing, v_outer_spacing,
