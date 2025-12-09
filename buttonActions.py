@@ -1,8 +1,39 @@
 import tkinter as tk
+from threading import Timer
+from time import sleep
 from BrailleCharacter import *
 from TKComponents.BrailleCharacter import draw_character_string
 from tkinter import filedialog
 from math import floor
+
+printing_rect_id = None
+printed_rect_id = None
+printing_line = None
+printed_line = None
+is_printing = False
+
+def updateRect(canvas, line_width, line_height):
+    global printing_rect_id
+    global printed_rect_id
+    global printing_line
+    global printed_line
+    if printing_rect_id is not None:
+        canvas.delete(printing_rect_id)
+        canvas.delete(printed_rect_id)
+    printing_rect_id=canvas.create_rectangle(
+        10, printing_line * line_height,
+        line_width, line_height * (printing_line + 1),
+        outline="green"
+    )
+    if printing_line >= 0:
+        printed_rect_id=canvas.create_rectangle(
+            10, 0,
+            line_width - 10, line_height * printed_line
+        )
+    printing_line += 1
+    printed_line += 1
+    Timer(2, updateRect, args=(canvas, line_width, line_height)).start()
+
 
 def openButtonAction(variavelDeTexto):
     caminho = filedialog.askopenfilename(
@@ -30,8 +61,14 @@ def saveButtonAction(text):
     f.write(text)
     f.close()
 
-def sendButtonAction():
-    pass
+def sendButtonAction(canvas):
+    line_height = 90
+    line_width=500
+    global printing_line
+    global printed_line
+    printing_line = 0
+    printed_line = -1
+    updateRect(canvas, line_width, line_height)
 
 
 def calculateCharLim(
@@ -87,7 +124,8 @@ def submitTextToConvertAction(
         ],
         iniX, iniY, charLim,
         dot_radius, h_spacing, v_spacing,
-        h_outer_spacing, v_outer_spacing
+        h_outer_spacing, v_outer_spacing,
+        text_variable_content
     )
     canvasWidth=currCanvasWidthInPixels
     brailleCanvas.create_line(iniX, 0, iniX, newCanvasHeight, dash=(2,2), fill="blue", width=1)

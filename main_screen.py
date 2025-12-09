@@ -33,11 +33,11 @@ paperDimensionOptions=getPaperDimensionOptions()
 paperDimensionOptionNames=[
     option.name for option in paperDimensionOptions
 ]
-dot_radius=5/30
-h_spacing=10/30
-v_spacing=10/30
-h_outer_spacing=10/30
-v_outer_spacing=10/30
+dot_radius=0.15#5/30
+h_spacing=0.1#10/30
+v_spacing=0.1#10/30
+h_outer_spacing=0.3#10/30
+v_outer_spacing=0.275#10/30
 
 
 #TKInter variables
@@ -46,17 +46,17 @@ charactersPerLine = tkinter.StringVar(root, value="20")
 selectedPaperDimension = tkinter.StringVar(root, value=paperDimensionOptionNames[0])
 textToConvert = tkinter.StringVar(root)
 
-dot_radius_tkvar=tkinter.StringVar(root)
-h_spacing_tkvar=tkinter.StringVar(root)
-v_spacing_tkvar=tkinter.StringVar(root)
-h_outer_spacing_tkvar=tkinter.StringVar(root)
-v_outer_spacing_tkvar=tkinter.StringVar(root)
+dot_radius_tkvar=tkinter.StringVar(root, value=dot_radius)
+h_spacing_tkvar=tkinter.StringVar(root, value=h_spacing)
+v_spacing_tkvar=tkinter.StringVar(root, value=v_spacing)
+h_outer_spacing_tkvar=tkinter.StringVar(root, value=h_outer_spacing)
+v_outer_spacing_tkvar=tkinter.StringVar(root, value=v_outer_spacing)
 param_tkvars={
-    "Raio": dot_radius_tkvar,
-    "Espaço interno horizontal": h_spacing_tkvar,
-    "Espaço interno vertical": v_spacing_tkvar,
-    "Espaço externo horizontal": h_outer_spacing_tkvar,
-    "Espaço externo vertical": v_outer_spacing_tkvar,
+#    "Raio": dot_radius_tkvar,
+#    "Espaço interno horizontal": h_spacing_tkvar,
+#    "Espaço interno vertical": v_spacing_tkvar,
+#    "Espaço externo horizontal": h_outer_spacing_tkvar,
+#    "Espaço externo vertical": v_outer_spacing_tkvar,
     "Margem": marginWidth
 }
 
@@ -67,6 +67,9 @@ fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
     canvasWidth, marginWidth,
     dot_radius_tkvar, h_spacing_tkvar, v_spacing_tkvar, h_outer_spacing_tkvar, v_outer_spacing_tkvar
 )
+
+def sendButtonAction():
+    buttonActions.sendButtonAction(brailleCanvas)    
 
 def cvtOpenButtonAction():
     content=buttonActions.openButtonAction(textToConvertEntry)
@@ -103,18 +106,18 @@ def saveButtonAction():
 row=0
 col=0
 for label, tkvar in param_tkvars.items():
-    LabeledEntry(
-        optionsFrame, textvariable=tkvar, width=15, label_text=label
-    ).grid(row=row, column=col)
-    col = (col + 1) % 3
-    if col == 0:
-        row += 1
+   LabeledEntry(
+       optionsFrame, textvariable=tkvar, width=15, label_text=label
+   ).grid(row=row, column=col)
+   col = (col + 1) % 3
+   if col == 0:
+       row += 1
 
 openButton=tkinter.Button(buttonsFrame, text=openString, command = cvtOpenButtonAction).pack(side='left', expand=True, fill='x')
 
 saveButton=tkinter.Button(buttonsFrame, text=saveString, command = saveButtonAction).pack(side='left', expand=True, fill='x')
 
-sendButton=tkinter.Button(buttonsFrame, text=sendString, command = buttonActions.sendButtonAction).pack(side='left', expand=True, fill='x')
+sendButton=tkinter.Button(buttonsFrame, text=sendString, command = sendButtonAction).pack(side='left', expand=True, fill='x')
 
 textToConvertEntry=tkinter.Text(textFrame, width=70)
 textToConvertEntry.pack(pady=10,padx=10)
@@ -141,5 +144,7 @@ brailleCanvas.pack(side="left")
 cd = BrailleCharacter.chars_as_dict(
     get_all_braille_characters()
 )
+
+brailleCanvas.create_rectangle(50, 50, 250,150, fill='white', outline='blue')
 
 root.mainloop()
