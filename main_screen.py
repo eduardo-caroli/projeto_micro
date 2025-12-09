@@ -52,11 +52,11 @@ v_spacing_tkvar=tkinter.StringVar(root, value=v_spacing)
 h_outer_spacing_tkvar=tkinter.StringVar(root, value=h_outer_spacing)
 v_outer_spacing_tkvar=tkinter.StringVar(root, value=v_outer_spacing)
 param_tkvars={
-#    "Raio": dot_radius_tkvar,
-#    "Espaço interno horizontal": h_spacing_tkvar,
-#    "Espaço interno vertical": v_spacing_tkvar,
-#    "Espaço externo horizontal": h_outer_spacing_tkvar,
-#    "Espaço externo vertical": v_outer_spacing_tkvar,
+    "Raio": dot_radius_tkvar,
+    "Espaço interno horizontal": h_spacing_tkvar,
+    "Espaço interno vertical": v_spacing_tkvar,
+    "Espaço externo horizontal": h_outer_spacing_tkvar,
+    "Espaço externo vertical": v_outer_spacing_tkvar,
     "Margem": marginWidth
 }
 
@@ -106,12 +106,13 @@ def saveButtonAction():
 row=0
 col=0
 for label, tkvar in param_tkvars.items():
-   LabeledEntry(
-       optionsFrame, textvariable=tkvar, width=15, label_text=label
-   ).grid(row=row, column=col)
-   col = (col + 1) % 3
-   if col == 0:
-       row += 1
+    tkvar.trace_add('write', lambda *args, **kwargs: fooBarBaz())
+    LabeledEntry(
+        optionsFrame, textvariable=tkvar, width=15, label_text=label
+    ).grid(row=row, column=col)
+    col = (col + 1) % 3
+    if col == 0:
+        row += 1
 
 openButton=tkinter.Button(buttonsFrame, text=openString, command = cvtOpenButtonAction).pack(side='left', expand=True, fill='x')
 
@@ -131,6 +132,7 @@ paperDimensionsSelection=tkinter.OptionMenu(
     selectedPaperDimension,
     *[option.name for option in getPaperDimensionOptions()]
 ).pack()
+selectedPaperDimension.trace_add('write', lambda *args, **kwargs: fooBarBaz())
 
 brailleCanvas = tkinter.Canvas(
     leavesFrame,
@@ -145,6 +147,6 @@ cd = BrailleCharacter.chars_as_dict(
     get_all_braille_characters()
 )
 
-brailleCanvas.create_rectangle(50, 50, 250,150, fill='white', outline='blue')
+textToConvertEntry.bind("<KeyRelease>", lambda *args, **kwargs: fooBarBaz())
 
 root.mainloop()
