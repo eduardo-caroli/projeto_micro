@@ -70,9 +70,7 @@ O Arduino é responsável por:
 
 ## Esquema do Circuito (Fritzing)
 
-> Substitua o arquivo abaixo pela imagem real do seu projeto.
-
-![Esquema de ligação no Fritzing](./docs/fritzing_conexao.png)
+![Esquema de ligação no Fritzing](circuito.jpeg)
 
 ---
 
