@@ -40,31 +40,40 @@ def _encode_line(line):
     return ("p:" + body).encode('utf-8')
 
 def _write_to_printer(lines_of_text: list[list[bool]], canvas, lineWidth, lineHeight):
+    print("started here")
     global writing_to_printer
     global num_printed_lines
-    for line in lines_of_text:
-        print(line)
-    sleep(1000)
     num_printed_lines=0
-    ard.write("ep: 5.0, el: 10.0, ec: 10.0".encode('utf-8'))
-    sleep(2)
-    encoded_line = _encode_line(lines_of_text[0])
     total_lines_to_print = len(lines_of_text)
     _updateRect(canvas, lineWidth, lineHeight)
-    ard.write(encoded_line)
+    first_line = True
+    printed_chars=0
+    line_to_print = lines_of_text[0]
+    first_writing = False
+    print("=====> ",line_to_print)
+    print("am here")
     while True:
+        if first_line or "p" in line:
+            char = line_to_print[printed_chars] if not first_writing else "100"
+            ard.write(char.encode('utf-8'))
+            print("=====> ", char)
+            printed_chars += 1
+            if first_writing and printed_chars == 4:
+                first_writing = False
+                printed_chars = 0
+            first_line = False
+            if printed_chars == len(line_to_print):
+                num_printed_lines += 1
+                if num_printed_lines >= total_lines_to_print:
+                    print("Impressao finalizada")
+                    writing_to_printer = False
+                    return
+                _updateRect(canvas, lineWidth, lineHeight)
+                line_to_print = lines_of_text[num_printed_lines]
+                printed_chars = 0
         line = ard.readline().decode()
-        if "Linha Finalizada" in line:
-            num_printed_lines += 1
-            if num_printed_lines >= total_lines_to_print:
-                print("Impressao finalizada")
-                writing_to_printer = False
-                return
-            _updateRect(canvas, lineWidth, lineHeight)
-            line_to_print = num_printed_lines
-            encoded_line = _encode_line(lines_of_text[line_to_print])
-            ard.write(encoded_line)
-        sleep(0.1)
+        sleep(0.2)
+        print("line was: ", line)
 
 def _updateRect(canvas, line_width, line_height):
     global printing_rect_id
@@ -78,6 +87,7 @@ def _updateRect(canvas, line_width, line_height):
         fill="green"
     )
     printed_line = num_printed_lines + 1
+
 
 def openButtonAction(variavelDeTexto):
     caminho = filedialog.askopenfilename(
@@ -96,15 +106,6 @@ def openButtonAction(variavelDeTexto):
             elif caminho.endswith('json'):
                 return conteudo
                     
-def _characterBoolToInt(c: list[list[bool]]) -> int:
-    c=np.array(c)
-    tr = np.vectorize(lambda e: 1 if e else 0)
-    c = tr(c)
-    c = np.flip(c, axis=-1)
-    c = np.flip(c, axis=0)
-    c = c.reshape(c.shape[0], -1)
-    return c
-    
 
 def saveButtonAction(text):
     f = filedialog.asksaveasfile(mode='w', defaultextension=".json")
@@ -113,31 +114,78 @@ def saveButtonAction(text):
     f.write(text)
     f.close()
 
+def lineToStream(line: str):
+    line=line[::-1]
+    cd = {
+        c.corresponding_character: c
+        for c in get_all_braille_characters()
+    }
+    line = [
+       cd[c.upper()]
+       for c in line
+    ]
+    bitline = ""
+    for char in line:
+        bitline += char.as_bits()
+    line1=""
+    line2=""
+    line3=""
+    print(bitline)
+    for i in range(len(bitline) // 6):
+        line1 += bitline[i*6:i*6 + 2]
+        line1 += "s"
+    line1 += "j"
+    for i in range(len(bitline) // 6):
+        line2 += bitline[2 + i*6:i*6 + 4]
+        line2 += "s"
+    line2 += "j"
+    for i in range(len(bitline) // 6):
+        line3 += bitline[4 + i*6:i*6 + 6]
+        line3 += "s"
+    line3 += "n"
+    return line1 + line2 + line3
+
 def sendButtonAction(
     text: list[list[bool]], canvas,
-    lineWidth, lineHeight, paperWidth
+    lineWidth, lineHeight, paperWidth,
+    dot_radius, v_inner_spacing, v_outer_spacing,
+    h_inner_spacing, h_outer_spacing
 ):
 #    lineWidth = cmsToPixels(500, lineWidth, lineWidth)
 #    lineHeight = cmsToPixels(500, lineWidth, lineHeight)
     text += " " * (charLim - (len(text) % charLim))
-    lkp=BrailleCharacter.chars_as_dict(get_all_braille_characters())
-    chars=[
-        lkp.get(char.upper()) or default
-        for char in text  
-    ]
-    text=chars
     lineWidth=500
     lineHeight *= (lineWidth / paperWidth)
-    text = _characterBoolToInt(text)
     from math import ceil
     lines_of_text = [
-        text[i*charLim : (i+1)*charLim]
+        lineToStream(text[i*charLim : (i+1)*charLim])
         for i in range(ceil(len(text)/charLim))
     ]
     global writing_to_printer
     if ard is None:
         print("Arduino nao conectado")
         return
+    inner_space = 2 * dot_radius + h_inner_spacing
+    values = [
+        dot_radius,
+        v_outer_spacing,
+        v_inner_spacing,
+        h_outer_spacing,
+    ]
+    values = [
+        int(ceil(2000 * float(v) / 4.5))
+        for v in values
+    ]
+    first_line=True
+    i=0
+    from math import ceil
+#    while i < 4:
+#        if first_line or 'p' in line.decode():
+#            line = ard.write(str(values[i]).encode('utf-8'))
+#            first_line = False
+#            i += 1
+#        line = ard.readline()  
+#        sleep(0.1)
     writing_to_printer=True
     Thread(target=_write_to_printer, daemon=True, args=(lines_of_text, canvas, lineWidth, lineHeight)).start()
     

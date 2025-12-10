@@ -76,7 +76,15 @@ def sendButtonAction():
         d.name: d.width
         for d in getPaperDimensionOptions()
     }[selectedPaperDimension.get()]
-    buttonActions.sendButtonAction(text_to_send, brailleCanvas, curr_paper_width, lineHeight, curr_paper_width)    
+    values_to_pass = [
+        dot_radius_tkvar, v_spacing_tkvar, v_outer_spacing_tkvar,
+        h_spacing_tkvar, h_outer_spacing_tkvar
+    ]
+    values_to_pass = [
+        v.get()
+        for v in values_to_pass
+    ]
+    buttonActions.sendButtonAction(text_to_send, brailleCanvas, curr_paper_width, lineHeight, curr_paper_width, *values_to_pass)    
 
 def cvtOpenButtonAction():
     content=buttonActions.openButtonAction(textToConvertEntry)

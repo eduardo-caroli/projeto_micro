@@ -13,6 +13,21 @@ class BrailleCharacter(BaseModel):
             for char in chars
         }
 
+    def as_int_array(self) -> list[int]:
+        array = []
+        for row in self.punchHoleBitmap:
+            array += [
+                1 if row[1] else 0,
+                1 if row[0] else 0
+            ]
+        return array
+
+    def as_bits(self) -> str:
+        s=""
+        for c in self.as_int_array():
+            s += str(c)
+        return s
+
 allCharacters = []
 with open("BrailleCharacters.json") as fp:
     brailleCharacters = json.load(fp)
