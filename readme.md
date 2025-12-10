@@ -77,15 +77,4 @@ O Arduino é responsável por:
 
 ## Vídeo do Projeto
 
-> Substitua o link abaixo pelo link do seu vídeo (YouTube, por exemplo).
-
-```html
-<iframe 
-  width="560" 
-  height="315" 
-  src="https://youtu.be/CR2iBlugKpk" 
-  title="Vídeo do Projeto - Impressora Braille"
-  frameborder="0" 
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-  allowfullscreen>
-</iframe>
+[Link para o vídeo do projeto](https://youtu.be/CR2iBlugKpk)
