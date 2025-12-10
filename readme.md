@@ -82,7 +82,7 @@ O Arduino é responsável por:
 <iframe 
   width="560" 
   height="315" 
-  src="https://www.youtube.com/embed/SEU_VIDEO_AQUI" 
+  src="https://youtu.be/CR2iBlugKpk" 
   title="Vídeo do Projeto - Impressora Braille"
   frameborder="0" 
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
