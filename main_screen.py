@@ -69,7 +69,14 @@ fooBarBaz = lambda: buttonActions.submitTextToConvertAction(
 )
 
 def sendButtonAction():
-    buttonActions.sendButtonAction(brailleCanvas)    
+    text_to_send = textToConvertEntry.get('1.0', 'end - 1c')
+    lkp=BrailleCharacter.chars_as_dict(get_all_braille_characters())
+    lineHeight = float(dot_radius_tkvar.get()) * 6 + 2 * float(v_spacing_tkvar.get()) + float(v_outer_spacing_tkvar.get())
+    curr_paper_width = {
+        d.name: d.width
+        for d in getPaperDimensionOptions()
+    }[selectedPaperDimension.get()]
+    buttonActions.sendButtonAction(text_to_send, brailleCanvas, curr_paper_width, lineHeight, curr_paper_width)    
 
 def cvtOpenButtonAction():
     content=buttonActions.openButtonAction(textToConvertEntry)
@@ -102,8 +109,6 @@ def saveButtonAction():
         state.model_dump_json()
     )
 
-def sendButtonAction():
-    buttonActions.sendButtonAction([[]],[[]], brailleCanvas)
 
 #Elements
 row=0
@@ -137,6 +142,8 @@ paperDimensionsSelection=tkinter.OptionMenu(
 ).pack()
 selectedPaperDimension.trace_add('write', lambda *args, **kwargs: fooBarBaz())
 
+print(canvasWidth)
+print(canvasHeight)
 brailleCanvas = tkinter.Canvas(
     leavesFrame,
     width=canvasWidth,
